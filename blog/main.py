@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import FastAPI, Depends, status, Response, HTTPException
 from sqlalchemy.orm import Session
 from . import schemas, models
@@ -48,14 +49,14 @@ def update(id: int, request: schemas.Blog, db: Session = Depends(get_db)):
     return f"Blog with id {id} was updated."
 
 
-@app.get("/blog", status_code=status.HTTP_200_OK)
+@app.get("/blog", status_code=status.HTTP_200_OK, response_model=List[schemas.ShowBlog])
 def all(db: Session = Depends(get_db)):
     blogs = db.query(models.Blog).all()
     return blogs
 
 
-@app.get("/blog/{id}")
-def show(id: int, response: Response, db: Session = Depends(get_db),):
+@app.get("/blog/{id}", response_model=schemas.ShowBlog)
+def show(id: int, response: Response, db: Session = Depends(get_db)):
     blogs = db.query(models.Blog).filter(models.Blog.id == id).first()
     if not blogs:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Blog with id {id} is not available.")
