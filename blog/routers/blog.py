@@ -7,9 +7,13 @@ from blog import schemas, models
 from blog.database import get_db
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/blog",
+    tags=["Blog"]
+)
 
-@router.post("/blog", status_code=status.HTTP_201_CREATED, tags=["Blog"])
+
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def create(request: schemas.Blog, db: Session = Depends(get_db)):
     new_blog = models.Blog(title=request.title, body=request.body, user_id=1)
     db.add(new_blog)
@@ -18,7 +22,7 @@ def create(request: schemas.Blog, db: Session = Depends(get_db)):
     return new_blog
 
 
-@router.delete("/blog/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Blog"])
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def destroy(id: int, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).delete(synchronize_session=False)
     if not blog:
@@ -27,7 +31,7 @@ def destroy(id: int, db: Session = Depends(get_db)):
     return f"Blog with id {id} was deleted."
 
 
-@router.put("/blog/{id}", status_code=status.HTTP_202_ACCEPTED, tags=["Blog"])
+@router.put("/{id}", status_code=status.HTTP_202_ACCEPTED)
 def update(id: int, request: schemas.Blog, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id)
 
@@ -40,13 +44,13 @@ def update(id: int, request: schemas.Blog, db: Session = Depends(get_db)):
     return f"Blog with id {id} was updated."
 
 
-@router.get("/blog", status_code=status.HTTP_200_OK, response_model=List[schemas.ShowBlog], tags=["Blog"])
+@router.get("/", status_code=status.HTTP_200_OK, response_model=List[schemas.ShowBlog])
 def all(db: Session = Depends(get_db)):
     blogs = db.query(models.Blog).all()
     return blogs
 
 
-@router.get("/blog/{id}", response_model=schemas.ShowBlog, tags=["Blog"])
+@router.get("/{id}", response_model=schemas.ShowBlog)
 def show(id: int, db: Session = Depends(get_db)):
     blogs = db.query(models.Blog).filter(models.Blog.id == id).first()
     if not blogs:
