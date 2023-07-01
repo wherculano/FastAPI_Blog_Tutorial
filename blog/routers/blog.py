@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
 
-from blog import schemas
+from blog import schemas, oauth2
 from blog.database import get_db
 from blog.repository import blog
 
@@ -15,17 +15,17 @@ router = APIRouter(
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create(request: schemas.Blog, db: Session = Depends(get_db)):
+def create(request: schemas.Blog, db: Session = Depends(get_db), current_user: schemas.User = Depends(oauth2.get_current_user)):
     return blog.create(db, request)
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def destroy(id: int, db: Session = Depends(get_db)):
+def destroy(id: int, db: Session = Depends(get_db), current_user: schemas.User = Depends(oauth2.get_current_user)):
     return blog.delete(id, db)
 
 
 @router.put("/{id}", status_code=status.HTTP_202_ACCEPTED)
-def update(id: int, request: schemas.Blog, db: Session = Depends(get_db)):
+def update(id: int, request: schemas.Blog, db: Session = Depends(get_db), current_user: schemas.User = Depends(oauth2.get_current_user)):
     return blog.update(id, request, db)
 
 
