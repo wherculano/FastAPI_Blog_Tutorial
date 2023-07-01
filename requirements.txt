@@ -3,3 +3,5 @@ SQLAlchemy>=2.0.16
 uvicorn>=0.22.0
 passlib>=1.7.4
 bcrypt>=4.0.1
+python-jose==3.3.0
+cryptography>=41.0.1
